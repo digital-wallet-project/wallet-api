@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String     
+  email     String     @unique   
+  password  String     
+  role      Role       @default(USER)
+  status    UserStatus @default(ACTIVE)
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  Wallet    Wallet?
+
+  @@index([email])
+  @@index([status])
+  @@index([role])
+}
+
+model Wallet {
+  id         String        @id @default(uuid())
+  userId     String        @unique
+  balance    Decimal       @db.Decimal(10, 2)
+  isActive   Boolean       @default(true)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  User       User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sentTransactions     Transaction[] @relation("WalletFrom")
+  receivedTransactions Transaction[] @relation("WalletTo")
+
+  @@index([userId])
+}
+
+model Transaction {
+  id                    String            @id @default(uuid())
+  walletFromId          String?
+  walletToId            String?
+  reversedTransactionId String?           @unique
+  type                  TransactionType
+  status                TransactionStatus @default(PENDING)
+  amount                Decimal           @db.Decimal(10, 2)
+  description           String?           
+  createdAt             DateTime          @default(now())
+
+  WalletFrom            Wallet?           @relation("WalletFrom", fields: [walletFromId], references: [id])
+  WalletTo              Wallet?           @relation("WalletTo", fields: [walletToId], references: [id])
+  ReversedTransaction   Transaction?      @relation("Reversal", fields: [reversedTransactionId], references: [id])
+  Reversal              Transaction?      @relation("Reversal")
+
+  @@index([walletFromId])
+  @@index([walletToId])
+  @@index([type])
+  @@index([status])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum TransactionType {
+  DEPOSIT
+  TRANSFER
+  REVERSAL
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  REVERSED
+}
