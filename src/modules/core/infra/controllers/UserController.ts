@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Put, Delete, Res, Req, Param, UseGuards } from '@nestjs/common'
+import { Body, Controller, Post, Put, Patch, Delete, Res, Req, Param, UseGuards } from '@nestjs/common'
 import { ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
 import { CreateUserUseCase } from '../../application/usecases/CreateUserUseCase'
 import { UpdateUserUseCase } from '../../application/usecases/UpdateUserUseCase'
 import { InactivateUserUseCase } from '../../application/usecases/InactivateUserUseCase'
+import { ReactivateUserUseCase } from '../../application/usecases/ReactivateUserUseCase'
 import { CreateUserDTO, UserPayloadDTO } from './dtos/UserDTO'
 import { JwtGuard } from 'src/shared/core/guards/JwtGuard'
 
@@ -13,7 +14,8 @@ export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
-    private readonly inactivateUserUseCase: InactivateUserUseCase
+    private readonly inactivateUserUseCase: InactivateUserUseCase,
+    private readonly reactivateUserUseCase: ReactivateUserUseCase
   ) {}
 
   @Post()
@@ -132,6 +134,50 @@ export class UserController {
         requesterRole: req.user.role, // jwt 
       })
       return res.status(200).json({ message: 'User inactivated sucessfully' })
+    } catch (err) {
+      return res.status(err.status ?? 500).json({ message: err.message })
+    }
+  }
+
+  @Patch('/:id/reactivate')
+  @UseGuards(JwtGuard)
+  @ApiHeader({ 
+    name: 'Authorization', 
+    description: 'Bearer token', 
+    required: true 
+  })
+  @ApiOperation({
+    summary: 'Reactivate user',
+    description: 'Endpoint for reactivating a user. Requires admin authentication.',
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'User reactivated successfully'
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'User is already active' 
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Forbidden – only admins can reactivate accounts' 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'User not found' 
+  })
+  @ApiResponse({ 
+    status: 500, 
+    description: 'Internal server error' 
+  })
+  async reactivate(@Res() res: Response, @Req() req: any, @Param('id') id: string) {
+    try {
+      await this.reactivateUserUseCase.execute({
+        targetId: id,
+        requesterId: req.user.id,
+        requesterRole: req.user.role,
+      })
+      return res.status(200).json({ message: 'User reactivated successfully' })
     } catch (err) {
       return res.status(err.status ?? 500).json({ message: err.message })
     }

@@ -15,6 +15,7 @@ import { JwtStrategy } from './shared/core/guards/JwtStrategy'
 import { CreateUserUseCase } from './modules/core/application/usecases/CreateUserUseCase'
 import { UpdateUserUseCase } from './modules/core/application/usecases/UpdateUserUseCase'
 import { InactivateUserUseCase } from './modules/core/application/usecases/InactivateUserUseCase'
+import { ReactivateUserUseCase } from './modules/core/application/usecases/ReactivateUserUseCase'
 
 
 @Module({
@@ -40,8 +41,8 @@ import { InactivateUserUseCase } from './modules/core/application/usecases/Inact
     //UseCases
     CreateUserUseCase,
     UpdateUserUseCase,
-    InactivateUserUseCase
-
+    InactivateUserUseCase,
+    ReactivateUserUseCase
   ],
 })
 export class CoreModule {}

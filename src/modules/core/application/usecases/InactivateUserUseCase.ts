@@ -3,8 +3,7 @@ import { User } from '@prisma/client'
 import { IUserRepo } from '../../infra/repository/IUserRepo'
 import { UserRepository } from '../../infra/repository/impl/UserRepository'
 import { RoleEnum } from 'src/shared/core/enums/RoleEnum'
-import { IUserInactivate } from 'src/shared/core/interfaces/user.interface'
-
+import { IUserActivationChange } from 'src/shared/core/interfaces/user.interface'
 
 @Injectable()
 export class InactivateUserUseCase {
@@ -13,7 +12,7 @@ export class InactivateUserUseCase {
     private readonly userRepo: IUserRepo,
   ) {}
 
-  async execute(payload: IUserInactivate): Promise<User> {
+  async execute(payload: IUserActivationChange): Promise<User> {
     const isAdmin = payload.requesterRole === RoleEnum.ADMIN
     const isSelf = payload.requesterId === payload.targetId
 

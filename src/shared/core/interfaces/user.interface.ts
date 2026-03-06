@@ -16,7 +16,7 @@ export interface IUserPayload {
   role?: RoleEnum
 }
 
-export interface IUserInactivate {
+export interface IUserActivationChange  {
   requesterId: string
   requesterRole: RoleEnum
   targetId: string

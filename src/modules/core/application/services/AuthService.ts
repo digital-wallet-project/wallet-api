@@ -20,6 +20,9 @@ export class AuthService {
     if (!isValid) 
       throw new UnauthorizedException('Invalid credentials')
 
+    if (!user.isActive)
+      throw new UnauthorizedException('Account is inactive')
+
     const jwtPayload = { sub: user.id, email: user.email, role: user.role }
     return { token: this.jwtService.sign(jwtPayload) }
   }
