@@ -21,8 +21,8 @@ export class UpdateUserUseCase {
     if (!isAdmin && !isSelf)
       throw new ForbiddenException('You can only update your own account')
 
-    if (!isAdmin && (payload.status || payload.role))
-      throw new ForbiddenException('You are not allowed to update status or role')
+    if (!isAdmin && payload.role)
+      throw new ForbiddenException('You are not allowed to update role')
 
     const target = await this.userRepo.findById(payload.targetId)
     if (!target) throw new NotFoundException('User not found')
@@ -59,7 +59,6 @@ export class UpdateUserUseCase {
       ...(payload.email && {email: payload.email,}),
       ...(hashedPassword && { password: hashedPassword }),
       ...(isAdmin && payload.role && { role: payload.role }),
-      ...(isAdmin && payload.status && { status: payload.status }),
     }
 
     if (!Object.keys(data).length)

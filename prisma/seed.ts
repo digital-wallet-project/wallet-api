@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import * as dotenv from 'dotenv'
 import { RoleEnum } from 'src/shared/core/enums/RoleEnum'
-import { UserStatusEnum } from 'src/shared/core/enums/UserStatusEnum'
 
 dotenv.config()
 
@@ -26,7 +25,6 @@ async function main() {
       email: 'admin@wallet.com',
       password: hashedPassword,
       role: RoleEnum.ADMIN,
-      status: UserStatusEnum.ACTIVE,
       isActive: true,
     }
   })

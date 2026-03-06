@@ -1,5 +1,4 @@
 import { RoleEnum } from "src/shared/core/enums/RoleEnum"
-import { UserStatusEnum } from "src/shared/core/enums/UserStatusEnum"
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
@@ -35,11 +34,6 @@ export class UserPayloadDTO {
   @IsString()
   @ApiPropertyOptional()
   password?: string
-
-  @IsOptional()
-  @IsEnum(UserStatusEnum)
-  @ApiPropertyOptional()
-  status?: UserStatusEnum
 
   @IsOptional()
   @IsEnum(RoleEnum)

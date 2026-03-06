@@ -1,5 +1,4 @@
 import { RoleEnum } from "../enums/RoleEnum"
-import { UserStatusEnum } from "../enums/UserStatusEnum"
 
 export interface ICreateUserRequest {
   name: string
@@ -14,7 +13,6 @@ export interface IUserPayload {
   name?: string
   email?: string
   password?: string
-  status?: UserStatusEnum
   role?: RoleEnum
 }
 
