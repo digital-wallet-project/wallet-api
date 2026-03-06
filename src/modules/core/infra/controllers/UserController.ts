@@ -1,15 +1,22 @@
-import { Body, Controller, Post, Res } from '@nestjs/common'
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Post, Put, Delete, Res, Req, Param, UseGuards } from '@nestjs/common'
+import { ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
 import { CreateUserUseCase } from '../../application/usecases/CreateUserUseCase'
-import { CreateUserDTO } from './dtos/UserDTO'
+import { UpdateUserUseCase } from '../../application/usecases/UpdateUserUseCase'
+import { InactivateUserUseCase } from '../../application/usecases/InactivateUserUseCase'
+import { CreateUserDTO, UserPayloadDTO } from './dtos/UserDTO'
+import { JwtGuard } from 'src/shared/core/guards/JwtGuard'
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly createUserUseCase: CreateUserUseCase) {}
+  constructor(
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly inactivateUserUseCase: InactivateUserUseCase
+  ) {}
 
-  @Post('register')
+  @Post()
   @ApiOperation({
     summary: 'Create user',
     description: 'Endpoint for creating a new user.',
@@ -35,6 +42,96 @@ export class UserController {
     try {
       const result = await this.createUserUseCase.execute(dto)
       return res.status(201).json(result)
+    } catch (err) {
+      return res.status(err.status ?? 500).json({ message: err.message })
+    }
+  }
+
+  @Put('/:id')
+  @UseGuards(JwtGuard)
+  @ApiHeader({ 
+    name: 'Authorization', 
+    description: 'Bearer token', 
+    required: true
+  })
+  @ApiOperation({
+    summary: 'Update user',
+    description: 'Endpoint for updating a user. Requires authentication.',
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'User updated successfully' 
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Validation error or no valid fields provided' 
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Forbidden – insufficient permissions' 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'User not found' 
+  })
+  @ApiResponse({ 
+    status: 500, description: 'Internal server error' 
+  })
+  @ApiBody({ type: UserPayloadDTO })
+  async update(@Res() res: Response, @Req() req: any, @Param('id') id: string, @Body() dto: UserPayloadDTO) {
+    try {
+      const result = await this.updateUserUseCase.execute({ 
+        ...dto, 
+        targetId: id, 
+        requesterId: req.user.id, // jwt
+        requesterRole: req.user.role, // jwt 
+      })
+      return res.status(200).json(result)
+    } catch (err) {
+      return res.status(err.status ?? 500).json({ message: err.message })
+    }
+  }
+
+
+  @Delete('/:id')
+  @UseGuards(JwtGuard)
+  @ApiHeader({ 
+    name: 'Authorization', 
+    description: 'Bearer token', 
+    required: true 
+  })
+  @ApiOperation({
+    summary: 'Inactivate user',
+    description: 'Endpoint for inactivating a user. Requires authentication.',
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'User inactivated successfully'
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'User is already inactive' 
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Forbidden – insufficient permissions' 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'User not found' 
+  })
+  @ApiResponse({ 
+    status: 500, 
+    description: 'Internal server error' 
+  })
+  async inactivate(@Res() res: Response, @Req() req: any, @Param('id') id: string) {
+    try {
+      await this.inactivateUserUseCase.execute({ 
+        targetId: id, 
+        requesterId: req.user.id, // jwt
+        requesterRole: req.user.role, // jwt 
+      })
+      return res.status(200).json({ message: 'User inactivated sucessfully' })
     } catch (err) {
       return res.status(err.status ?? 500).json({ message: err.message })
     }

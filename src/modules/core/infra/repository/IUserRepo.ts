@@ -7,4 +7,5 @@ export interface IUserRepo {
   findByEmail(email: string): Promise<User | null>
   update(id: string, data: Prisma.UserUpdateInput): Promise<User>
   delete(id: string): Promise<void>
+  countAdmins(): Promise<number>
 }

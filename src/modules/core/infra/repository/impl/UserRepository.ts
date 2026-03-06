@@ -4,6 +4,7 @@ import { PrismaService } from 'src/shared/infra/database/prisma/PrismaService'
 import { UserMapper } from 'src/modules/core/application/mappers/UserMap'
 import { UserDomain } from 'src/modules/core/domain/entity/UserDomain'
 import { IUserRepo } from '../IUserRepo'
+import { RoleEnum } from 'src/shared/core/enums/RoleEnum'
 
 @Injectable()
 export class UserRepository implements IUserRepo {
@@ -28,5 +29,14 @@ export class UserRepository implements IUserRepo {
 
   async delete(id: string): Promise<void> {
     await this.prisma.user.delete({ where: { id } })
+  }
+
+  async countAdmins(): Promise<number> {
+    return await this.prisma.user.count({
+      where: { 
+        role: RoleEnum.ADMIN, 
+        isActive: true 
+      }
+    })
   }
 }
