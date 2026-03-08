@@ -3,7 +3,6 @@ import { Entity } from 'src/shared/domain/Entity'
 export interface WalletProps {
   userId: string
   balance: number
-  isActive?: boolean
   createdAt?: Date
   updatedAt?: Date
 }
@@ -23,10 +22,6 @@ export class WalletDomain extends Entity<WalletProps> {
 
   get balance(): number {
     return this.props.balance
-  }
-
-  get isActive(): boolean | undefined {
-    return this.props.isActive
   }
 
   get createdAt(): Date | undefined {

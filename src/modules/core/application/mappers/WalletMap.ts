@@ -6,7 +6,6 @@ export class WalletMapper {
     const entityProps = {
       userId: dbEntity.userId,
       balance: dbEntity.balance.toNumber(),
-      isActive: dbEntity.isActive,
       createdAt: dbEntity.createdAt,
       updatedAt: dbEntity.updatedAt,
     } as WalletProps;
@@ -29,7 +28,6 @@ export class WalletMapper {
     return {
       id: payload._id,
       balance: payload.balance,
-      isActive: payload.isActive,
       createdAt: payload.createdAt,
       updatedAt: payload.updatedAt,
       User
