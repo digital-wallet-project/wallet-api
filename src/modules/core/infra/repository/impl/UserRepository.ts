@@ -10,9 +10,10 @@ import { RoleEnum } from 'src/shared/core/enums/RoleEnum'
 export class UserRepository implements IUserRepo {
   constructor(private readonly prisma: PrismaService) {}
 
-  async save(register: UserDomain): Promise<User> {
+  async save(register: UserDomain, tx?: Prisma.TransactionClient): Promise<User> {
+    const prismaClient = tx ?? this.prisma
     const data = UserMapper.toPersistence(register)
-    return await this.prisma.user.create({ data })
+    return await prismaClient.user.create({ data })
   }
 
   async findById(id: string): Promise<User | null> {

@@ -3,9 +3,11 @@ import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 //Controllers
 import { AuthController } from './modules/core/infra/controllers/Auth.controller'
-import { UserController } from './modules/core/infra/controllers/UserController'
+import { UserController } from './modules/core/infra/controllers/User.controller'
+import { WalletController } from './modules/core/infra/controllers/Wallet.controller'
 // Repositories
 import { UserRepository } from './modules/core/infra/repository/impl/UserRepository'
+import { WalletRepository } from './modules/core/infra/repository/impl/WalletRepository'
 // Services
 import { AuthService } from './modules/core/application/services/AuthService'
 import { PrismaService } from './shared/infra/database/prisma/PrismaService'
@@ -16,7 +18,7 @@ import { CreateUserUseCase } from './modules/core/application/usecases/CreateUse
 import { UpdateUserUseCase } from './modules/core/application/usecases/UpdateUserUseCase'
 import { InactivateUserUseCase } from './modules/core/application/usecases/InactivateUserUseCase'
 import { ReactivateUserUseCase } from './modules/core/application/usecases/ReactivateUserUseCase'
-
+import { GetWalletUseCase } from './modules/core/application/usecases/GetWalletUseCase'
 
 @Module({
   imports: [
@@ -28,11 +30,13 @@ import { ReactivateUserUseCase } from './modules/core/application/usecases/React
   ],
   controllers: [
     AuthController,
-    UserController
+    UserController,
+    WalletController
   ],
   providers: [
     // Repositories
     UserRepository,
+    WalletRepository,
     // Services
     PrismaService,
     AuthService,
@@ -42,7 +46,8 @@ import { ReactivateUserUseCase } from './modules/core/application/usecases/React
     CreateUserUseCase,
     UpdateUserUseCase,
     InactivateUserUseCase,
-    ReactivateUserUseCase
+    ReactivateUserUseCase,
+    GetWalletUseCase
   ],
 })
 export class CoreModule {}
