@@ -1,98 +1,91 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Wallet API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST para gerenciamento de carteiras digitais com transferências entre usuários.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+O sistema possui regras de autorização, integridade financeira e controle de usuários, garantindo que operações críticas sejam executadas com segurança.
 
-## Description
+## Tecnologias
+- **TypeScript**
+- **NestJS** — Framework Node.js
+- **Prisma** — ORM
+- **MySQL** — Banco de dados
+- **JWT** — Autenticação
+- **Docker** — Ambiente de banco de dados
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Como rodar
 
-## Project setup
-
+### Instalação
 ```bash
-$ npm install
+# Instalar dependências
+npm install
+
+# Subir o banco de dados
+docker-compose up -d
+
+# Rodar as migrations
+npx prisma migrate dev
+
+# Popular o banco com o admin
+npx prisma db seed
+
+# Rodar a aplicação
+npm run start:dev
 ```
 
-## Compile and run the project
+## Regras de negócio
 
-```bash
-# development
-$ npm run start
+### Usuário
+- Ao criar um usuário, uma carteira é criada automaticamente
+- Usuário pode atualizar e inativar a própria conta
+- Admin pode atualizar e inativar qualquer conta USER
+- Admin não pode inativar outro Admin
+- Admin não pode se inativar se for o único Admin
+- Apenas Admin pode reativar qualquer conta
+- Usuário inativo não consegue fazer login
 
-# watch mode
-$ npm run start:dev
+### Carteira
+- Criada automaticamente ao criar usuário com saldo R$ 0,00
+- Saldo preservado mesmo com usuário inativo
+- Não pode ser deletada
 
-# production mode
-$ npm run start:prod
-```
+### Transações
+- **Depósito:** Valor mínimo de R$ 10,00, apenas na própria carteira
+- **Transferência:** Saldo suficiente obrigatório, valor deve ser maior que zero, não é permitido transferir para si mesmo
+- **Estorno:** Apenas Admin, somente transferências concluídas, prazo de 24h
 
-## Run tests
+## Rotas
 
-```bash
-# unit tests
-$ npm run test
+### Auth
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| POST | /auth/login | Autenticação |
 
-# e2e tests
-$ npm run test:e2e
+### User
+| Método | Rota | Descrição | Auth |
+|--------|------|-----------|------|
+| POST | /user | Criar usuário | ❌ |
+| PUT | /user/:id | Atualizar usuário | ✅ |
+| DELETE | /user/:id | Inativar usuário | ✅ |
+| PATCH | /user/:id/reactivate | Reativar usuário | ✅ Admin |
 
-# test coverage
-$ npm run test:cov
-```
+### Wallet
+| Método | Rota | Descrição | Auth |
+|--------|------|-----------|------|
+| GET | /wallet | Ver própria carteira | ✅ |
+| GET | /wallet/:id | Ver qualquer carteira | ✅ Admin |
 
-## Deployment
+### Transaction
+| Método | Rota | Descrição | Auth |
+|--------|------|-----------|------|
+| POST | /transaction/deposit | Depositar | ✅ |
+| POST | /transaction/transfer | Transferir | ✅ |
+| PUT | /transaction/:id/reversal | Estornar | ✅ Admin |
+| GET | /transaction | Listar transações | ✅ |
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Autor
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**Raphael da Silva Santos**  
+Campinas - SP
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- [LinkedIn](https://www.linkedin.com/in/raphael-santos-a50721280/)
+- [GitHub](https://github.com/rphsantoss)
