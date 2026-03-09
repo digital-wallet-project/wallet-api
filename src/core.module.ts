@@ -5,9 +5,11 @@ import { PassportModule } from '@nestjs/passport'
 import { AuthController } from './modules/core/infra/controllers/Auth.controller'
 import { UserController } from './modules/core/infra/controllers/User.controller'
 import { WalletController } from './modules/core/infra/controllers/Wallet.controller'
+import { TransactionController } from './modules/core/infra/controllers/Transaction.controller'
 // Repositories
 import { UserRepository } from './modules/core/infra/repository/impl/UserRepository'
 import { WalletRepository } from './modules/core/infra/repository/impl/WalletRepository'
+import { TransactionRepository } from './modules/core/infra/repository/impl/TransactionRepository'
 // Services
 import { AuthService } from './modules/core/application/services/AuthService'
 import { PrismaService } from './shared/infra/database/prisma/PrismaService'
@@ -19,6 +21,7 @@ import { UpdateUserUseCase } from './modules/core/application/usecases/UpdateUse
 import { InactivateUserUseCase } from './modules/core/application/usecases/InactivateUserUseCase'
 import { ReactivateUserUseCase } from './modules/core/application/usecases/ReactivateUserUseCase'
 import { GetWalletUseCase } from './modules/core/application/usecases/GetWalletUseCase'
+import { DepositUseCase } from './modules/core/application/usecases/DepositUseCase'
 
 @Module({
   imports: [
@@ -31,12 +34,14 @@ import { GetWalletUseCase } from './modules/core/application/usecases/GetWalletU
   controllers: [
     AuthController,
     UserController,
-    WalletController
+    WalletController,
+    TransactionController
   ],
   providers: [
     // Repositories
     UserRepository,
     WalletRepository,
+    TransactionRepository,
     // Services
     PrismaService,
     AuthService,
@@ -47,7 +52,8 @@ import { GetWalletUseCase } from './modules/core/application/usecases/GetWalletU
     UpdateUserUseCase,
     InactivateUserUseCase,
     ReactivateUserUseCase,
-    GetWalletUseCase
+    GetWalletUseCase,
+    DepositUseCase
   ],
 })
 export class CoreModule {}

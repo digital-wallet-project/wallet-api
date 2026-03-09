@@ -22,8 +22,9 @@ export class WalletRepository implements IWalletRepo {
     return await this.prisma.wallet.findFirst({ where: { userId } })
   }
 
-  async update(id: string, data: Prisma.WalletUpdateInput): Promise<Wallet> {
-    return await this.prisma.wallet.update({ where: { id }, data })
+  async update(id: string, data: Prisma.WalletUpdateInput, tx?: Prisma.TransactionClient): Promise<Wallet> {
+    const prismaClient = tx ?? this.prisma
+    return await prismaClient.wallet.update({ where: { id }, data })
   }
 
   async delete(id: string): Promise<void> {
