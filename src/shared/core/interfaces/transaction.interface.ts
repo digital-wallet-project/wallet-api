@@ -1,13 +1,16 @@
-import { TransactionType } from "@prisma/client"
 import { RoleEnum } from "../enums/RoleEnum"
 
-export interface ITransactionPayload {
+export interface IDepositPayload {
   requesterId: string
   requesterRole: RoleEnum
-  type: TransactionType
   amount: number
   description?: string
-  walletFromId?: string
-  walletToId?: string
-  transactionId?: string // para REVERSAL
+}
+
+export interface ITransferPayload {
+  requesterId: string
+  requesterRole: RoleEnum
+  amount: number
+  walletToId: string
+  description?: string
 }

@@ -22,6 +22,7 @@ import { InactivateUserUseCase } from './modules/core/application/usecases/Inact
 import { ReactivateUserUseCase } from './modules/core/application/usecases/ReactivateUserUseCase'
 import { GetWalletUseCase } from './modules/core/application/usecases/GetWalletUseCase'
 import { DepositUseCase } from './modules/core/application/usecases/DepositUseCase'
+import { TransferUseCase } from './modules/core/application/usecases/TransferUseCase'
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { DepositUseCase } from './modules/core/application/usecases/DepositUseCa
     InactivateUserUseCase,
     ReactivateUserUseCase,
     GetWalletUseCase,
-    DepositUseCase
+    DepositUseCase,
+    TransferUseCase
   ],
 })
 export class CoreModule {}

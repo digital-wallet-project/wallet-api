@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
+import { Inject, Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common'
 import { IWalletRepo } from '../../infra/repository/IWalletRepo'
 import { WalletRepository } from '../../infra/repository/impl/WalletRepository'
 import { ITransactionRepo } from '../../infra/repository/ITransactionRepo'
@@ -7,10 +7,10 @@ import { PrismaService } from 'src/shared/infra/database/prisma/PrismaService'
 import { TransactionDomain } from '../../domain/entity/TransactionDomain'
 import { TransactionTypeEnum } from 'src/shared/core/enums/TransactionTypeEnum'
 import { TransactionStatusEnum } from 'src/shared/core/enums/TransactionStatusEnum'
-import { IDepositPayload } from 'src/shared/core/interfaces/transaction.interface'
+import { ITransferPayload } from 'src/shared/core/interfaces/transaction.interface'
 
 @Injectable()
-export class DepositUseCase {
+export class TransferUseCase {
   constructor(
     @Inject(WalletRepository)
     private readonly walletRepo: IWalletRepo,
@@ -19,21 +19,33 @@ export class DepositUseCase {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(payload: IDepositPayload): Promise<void> {
-    const wallet = await this.walletRepo.findByUserId(payload.requesterId)
-    if (!wallet)
+  async execute(payload: ITransferPayload): Promise<void> {
+    const walletFrom = await this.walletRepo.findByUserId(payload.requesterId)
+    if (!walletFrom)
       throw new NotFoundException('Wallet not found')
 
-    if (payload.amount < 10)
-      throw new BadRequestException('Minimum deposit amount is R$ 10,00')
+    const walletTo = await this.walletRepo.findById(payload.walletToId)
+    if (!walletTo)
+      throw new NotFoundException('Destination wallet not found')
+
+    if (walletFrom.id === walletTo.id)
+      throw new BadRequestException('Cannot transfer to your own wallet')
+
+    if (payload.amount <= 0)
+      throw new BadRequestException('Amount must be greater than zero')
+
+    if (walletFrom.balance.toNumber() < payload.amount)
+      throw new BadRequestException('Insufficient balance')
 
     await this.prisma.$transaction(async (tx) => {
-      await this.walletRepo.update(wallet.id, { balance: { increment: payload.amount } }, tx)
+      await this.walletRepo.update(walletFrom.id, { balance: { decrement: payload.amount } }, tx)
+      await this.walletRepo.update(walletTo.id, { balance: { increment: payload.amount } }, tx)
 
       await this.transactionRepo.save(
         TransactionDomain.create({
-          walletToId: wallet.id,
-          type: TransactionTypeEnum.DEPOSIT,
+          walletFromId: walletFrom.id,
+          walletToId: walletTo.id,
+          type: TransactionTypeEnum.TRANSFER,
           status: TransactionStatusEnum.COMPLETED,
           amount: payload.amount,
           description: payload.description,

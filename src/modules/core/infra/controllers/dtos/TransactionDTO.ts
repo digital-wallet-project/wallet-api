@@ -1,35 +1,31 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { TransactionTypeEnum } from "src/shared/core/enums/TransactionTypeEnum";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class TransactionRequestDTO {
-  @IsNotEmpty()
-  @IsEnum(TransactionTypeEnum)
-  @ApiProperty()
-  type: TransactionTypeEnum
-
+export class DepositDTO {
   @IsNotEmpty()
   @IsNumber()
-  @ApiPropertyOptional()
+  @ApiProperty()
   amount: number
 
   @IsOptional()
   @IsString()
   @ApiPropertyOptional()
   description?: string
+}
+
+export class TransferDTO {
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty()
+  amount: number
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty()
+  walletToId: string
 
   @IsOptional()
   @IsString()
   @ApiPropertyOptional()
-  walletFromId?: string
-
-  @IsOptional()
-  @IsString()
-  @ApiPropertyOptional()
-  walletToId?: string
-
-  @IsOptional()
-  @IsString()
-  @ApiPropertyOptional()
-  transactionId?: string
+  description?: string
 }
