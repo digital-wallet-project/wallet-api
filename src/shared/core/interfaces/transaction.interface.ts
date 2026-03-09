@@ -1,4 +1,5 @@
 import { RoleEnum } from "../enums/RoleEnum"
+import { TransactionTypeEnum } from "../enums/TransactionTypeEnum"
 
 export interface IDepositPayload {
   requesterId: string
@@ -19,4 +20,10 @@ export interface IReversalPayload {
   requesterId: string
   requesterRole: RoleEnum
   transactionId: string
+}
+
+export interface IGetTransactionsPayload {
+  requesterId: string
+  requesterRole: RoleEnum
+  type?: TransactionTypeEnum
 }

@@ -4,6 +4,7 @@ import { PrismaService } from 'src/shared/infra/database/prisma/PrismaService'
 import { TransactionMapper } from 'src/modules/core/application/mappers/TransactionMap'
 import { TransactionDomain } from 'src/modules/core/domain/entity/TransactionDomain'
 import { ITransactionRepo } from '../ITransactionRepo'
+import { TransactionTypeEnum } from 'src/shared/core/enums/TransactionTypeEnum'
 
 @Injectable()
 export class TransactionRepository implements ITransactionRepo {
@@ -17,6 +18,19 @@ export class TransactionRepository implements ITransactionRepo {
 
   async findById(id: string): Promise<Transaction | null> {
     return await this.prisma.transaction.findFirst({ where: { id } })
+  }
+
+  async findByWalletId(walletId: string, type?: TransactionTypeEnum): Promise<Transaction[]> {
+    return await this.prisma.transaction.findMany({
+      where: {
+        OR: [
+          { walletFromId: walletId },
+          { walletToId: walletId },
+        ],
+        ...(type && { type }),
+      },
+      orderBy: { createdAt: 'desc' },
+    })
   }
 
   async update(id: string, data: Prisma.UserUpdateInput, tx?: Prisma.TransactionClient): Promise<Transaction> {
