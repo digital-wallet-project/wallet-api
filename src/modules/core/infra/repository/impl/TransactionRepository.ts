@@ -19,8 +19,9 @@ export class TransactionRepository implements ITransactionRepo {
     return await this.prisma.transaction.findFirst({ where: { id } })
   }
 
-  async update(id: string, data: Prisma.UserUpdateInput): Promise<Transaction> {
-    return await this.prisma.transaction.update({ where: { id }, data })
+  async update(id: string, data: Prisma.UserUpdateInput, tx?: Prisma.TransactionClient): Promise<Transaction> {
+    const prismaClient = tx ?? this.prisma
+    return await prismaClient.transaction.update({ where: { id }, data })
   }
 
   async delete(id: string): Promise<void> {

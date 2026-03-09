@@ -1,8 +1,9 @@
-import { Body, Controller, Post, Res, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Post, Put, Res, Req, Param, UseGuards } from '@nestjs/common'
 import { ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
 import { DepositUseCase } from '../../application/usecases/DepositUseCase'
 import { TransferUseCase } from '../../application/usecases/TransferUseCase'
+import { ReversalUseCase } from '../../application/usecases/ReversalUseCase'
 import { DepositDTO, TransferDTO } from './dtos/TransactionDTO'
 import { JwtGuard } from 'src/shared/core/guards/JwtGuard'
 
@@ -12,6 +13,7 @@ export class TransactionController {
   constructor(
     private readonly depositUseCase: DepositUseCase,
     private readonly transferUseCase: TransferUseCase,
+    private readonly reversalUseCase: ReversalUseCase,
   ) {}
 
   @Post('/deposit')
@@ -87,6 +89,50 @@ export class TransactionController {
     try {
       await this.transferUseCase.execute({
         ...dto,
+        requesterId: req.user.id,
+        requesterRole: req.user.role,
+      })
+      return res.status(201).json({ message: 'Transaction completed successfully' })
+    } catch (err) {
+      return res.status(err.status ?? 500).json({ message: err.message })
+    }
+  }
+
+  @Put('/:transactionId/reversal')
+  @UseGuards(JwtGuard)
+  @ApiHeader({ 
+    name: 'Authorization', 
+    description: 'Bearer token', 
+    required: true 
+  })
+  @ApiOperation({ 
+    summary: 'Reversal', 
+    description: 'Reverse a transaction. Admin only.' 
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Transaction completed successfully' 
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Transaction must be a completed transfer to be reversed'
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Only admins can reverse transactions' 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Transaction not found' 
+  })
+  @ApiResponse({ 
+    status: 500, 
+    description: 'Internal server error' 
+  })
+  async reversal(@Res() res: Response, @Req() req: any, @Param('transactionId') transactionId: string) {
+    try {
+      await this.reversalUseCase.execute({
+        transactionId,
         requesterId: req.user.id,
         requesterRole: req.user.role,
       })

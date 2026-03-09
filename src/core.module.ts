@@ -23,6 +23,7 @@ import { ReactivateUserUseCase } from './modules/core/application/usecases/React
 import { GetWalletUseCase } from './modules/core/application/usecases/GetWalletUseCase'
 import { DepositUseCase } from './modules/core/application/usecases/DepositUseCase'
 import { TransferUseCase } from './modules/core/application/usecases/TransferUseCase'
+import { ReversalUseCase } from './modules/core/application/usecases/ReversalUseCase'
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { TransferUseCase } from './modules/core/application/usecases/TransferUse
     ReactivateUserUseCase,
     GetWalletUseCase,
     DepositUseCase,
-    TransferUseCase
+    TransferUseCase,
+    ReversalUseCase
   ],
 })
 export class CoreModule {}

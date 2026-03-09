@@ -14,3 +14,9 @@ export interface ITransferPayload {
   walletToId: string
   description?: string
 }
+
+export interface IReversalPayload {
+  requesterId: string
+  requesterRole: RoleEnum
+  transactionId: string
+}
