@@ -18,6 +18,8 @@ export class GetWalletUseCase {
     if (!isAdmin && payload.walletId) 
       throw new ForbiddenException('You can only view your own wallet')
 
+// se for admin e passou um walletId, busca a wallet pelo id
+// caso contrário, busca a wallet pelo id do usuário logado
     const wallet = isAdmin && payload.walletId
       ? await this.walletRepo.findById(payload.walletId)
       : await this.walletRepo.findByUserId(payload.requesterId)
