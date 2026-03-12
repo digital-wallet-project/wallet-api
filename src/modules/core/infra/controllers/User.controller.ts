@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Put, Patch, Delete, Res, Req, Param, UseGuards } from '@nestjs/common'
+import { Body, Controller, Query, Get, Post, Put, Patch, Delete, Res, Req, Param, UseGuards } from '@nestjs/common'
 import { ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
 import { CreateUserUseCase } from '../../application/usecases/CreateUserUseCase'
 import { UpdateUserUseCase } from '../../application/usecases/UpdateUserUseCase'
 import { InactivateUserUseCase } from '../../application/usecases/InactivateUserUseCase'
 import { ReactivateUserUseCase } from '../../application/usecases/ReactivateUserUseCase'
+import { GetUsersUseCase } from '../../application/usecases/GetUsersUseCase'
 import { CreateUserDTO, UserPayloadDTO } from './dtos/UserDTO'
 import { JwtGuard } from 'src/shared/core/guards/JwtGuard'
 
@@ -15,7 +16,8 @@ export class UserController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly inactivateUserUseCase: InactivateUserUseCase,
-    private readonly reactivateUserUseCase: ReactivateUserUseCase
+    private readonly reactivateUserUseCase: ReactivateUserUseCase,
+    private readonly getUsersUseCase: GetUsersUseCase
   ) {}
 
   @Post()
@@ -178,6 +180,42 @@ export class UserController {
         requesterRole: req.user.role,
       })
       return res.status(200).json({ message: 'User reactivated successfully' })
+    } catch (err) {
+      return res.status(err.status ?? 500).json({ message: err.message })
+    }
+  }
+
+  @Get()
+  @UseGuards(JwtGuard)
+  @ApiHeader({ 
+    name: 'Authorization', 
+    description: 'Bearer token', 
+    required: true 
+  })
+  @ApiOperation({ 
+    summary: 'Get users by email', 
+    description: 'Admin only.' 
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Users found' 
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: 'Forbidden – admin only' 
+  })
+  @ApiResponse({ 
+    status: 500, 
+    description: 'Internal server error' 
+  })
+  async getUsers(@Res() res: Response, @Req() req: any, @Query('email') email: string) {
+    try {
+      const result = await this.getUsersUseCase.execute({
+        email,
+        requesterId: req.user.id,
+        requesterRole: req.user.role,
+      })
+      return res.status(200).json(result)
     } catch (err) {
       return res.status(err.status ?? 500).json({ message: err.message })
     }

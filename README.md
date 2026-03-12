@@ -54,6 +54,7 @@ npm run start:dev
 - Admin não pode inativar outro Admin
 - Admin não pode se inativar se for o único Admin
 - Apenas Admin pode reativar qualquer conta
+- Apenas Admin pode listar usuários
 - Usuário inativo não consegue fazer login
 
 ### Carteira
@@ -77,6 +78,7 @@ npm run start:dev
 | Método | Rota | Descrição | Auth |
 |--------|------|-----------|------|
 | POST | /user | Criar usuário | ❌ |
+| GET | /user | Listar usuários | ✅ Admin |
 | PUT | /user/:id | Atualizar usuário | ✅ |
 | DELETE | /user/:id | Inativar usuário | ✅ |
 | PATCH | /user/:id/reactivate | Reativar usuário | ✅ Admin |

@@ -24,6 +24,15 @@ export class UserRepository implements IUserRepo {
     return await this.prisma.user.findFirst({ where: { email } })
   }
 
+  async findAll(email?: string): Promise<User[]> {
+    return await this.prisma.user.findMany({
+      where: {
+        role: RoleEnum.USER,
+        ...(email && { email: { contains: email } })
+      }
+    })
+  }
+
   async update(id: string, data: Prisma.UserUpdateInput): Promise<User> {
     return await this.prisma.user.update({ where: { id }, data })
   }

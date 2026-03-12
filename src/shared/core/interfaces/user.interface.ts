@@ -21,3 +21,9 @@ export interface IUserActivationChange  {
   requesterRole: RoleEnum
   targetId: string
 }
+
+export interface IGetUsers {
+  requesterId: string
+  requesterRole: RoleEnum
+  email?: string
+}
