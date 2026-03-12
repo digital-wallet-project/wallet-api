@@ -14,13 +14,26 @@ O sistema possui regras de autorização, integridade financeira e controle de u
 
 ## Como rodar
 
+## Testes
+
+O projeto possui testes de integração cobrindo todos os use cases e regras de negócio.
+
+### Rodar os testes
+```bash
+# Subir o banco de dados
+docker-compose up
+
+# Rodar os testes
+npm run test
+```
+
 ### Instalação
 ```bash
 # Instalar dependências
 npm install
 
 # Subir o banco de dados
-docker-compose up -d
+docker-compose up
 
 # Rodar as migrations
 npx prisma migrate dev
