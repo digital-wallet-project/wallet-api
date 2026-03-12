@@ -9,7 +9,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   const existing = await prisma.user.findFirst({
-    where: { role: 'ADMIN' }
+    where: { role: RoleEnum.ADMIN }
   })
 
   if (existing) {
@@ -19,14 +19,25 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD!, 10)
 
-  const admin = await prisma.user.create({
-    data: {
-      name: 'Admin',
-      email: process.env.ADMIN_EMAIL!,
-      password: hashedPassword,
-      role: RoleEnum.ADMIN,
-      isActive: true,
-    }
+  const admin = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        name: 'Admin',
+        email: process.env.ADMIN_EMAIL!,
+        password: hashedPassword,
+        role: RoleEnum.ADMIN,
+        isActive: true,
+      }
+    })
+
+    await tx.wallet.create({
+      data: {
+        userId: user.id,
+        balance: 0,
+      }
+    })
+
+    return user
   })
 
   console.log('Admin created:', admin.email)
