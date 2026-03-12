@@ -23,7 +23,7 @@ export class AuthService {
     if (!user.isActive)
       throw new UnauthorizedException('Account is inactive')
 
-    const jwtPayload = { sub: user.id, email: user.email, role: user.role }
+    const jwtPayload = { sub: user.id, name: user.name, email: user.email, role: user.role }
     return { token: this.jwtService.sign(jwtPayload) }
   }
 
