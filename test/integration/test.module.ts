@@ -9,6 +9,7 @@ import { CreateUserUseCase } from 'src/modules/core/application/usecases/CreateU
 import { UpdateUserUseCase } from 'src/modules/core/application/usecases/UpdateUserUseCase'
 import { InactivateUserUseCase } from 'src/modules/core/application/usecases/InactivateUserUseCase'
 import { ReactivateUserUseCase } from 'src/modules/core/application/usecases/ReactivateUserUseCase'
+import { GetUsersUseCase } from 'src/modules/core/application/usecases/GetUsersUseCase'
 import { GetWalletUseCase } from 'src/modules/core/application/usecases/GetWalletUseCase'
 import { DepositUseCase } from 'src/modules/core/application/usecases/DepositUseCase'
 import { TransferUseCase } from 'src/modules/core/application/usecases/TransferUseCase'
@@ -33,6 +34,7 @@ export async function createTestModule(): Promise<TestingModule> {
       UpdateUserUseCase,
       InactivateUserUseCase,
       ReactivateUserUseCase,
+      GetUsersUseCase,
       GetWalletUseCase,
       DepositUseCase,
       TransferUseCase,
