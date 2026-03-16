@@ -43,10 +43,9 @@ describe('ReversalUseCase (integration)', () => {
     await createUserUseCase.execute({ name: 'User2', email: 'user2@email.com', password: 'senha123' })
     const user1 = await prisma.user.findFirst({ where: { email: 'user1@email.com' } })
     const user2 = await prisma.user.findFirst({ where: { email: 'user2@email.com' } })
-    const walletTo = await prisma.wallet.findFirst({ where: { userId: user2!.id } })
 
     await depositUseCase.execute({ requesterId: user1!.id, requesterRole: RoleEnum.USER, amount: 100 })
-    await transferUseCase.execute({ requesterId: user1!.id, requesterRole: RoleEnum.USER, walletToId: walletTo!.id, amount })
+    await transferUseCase.execute({ requesterId: user1!.id, requesterRole: RoleEnum.USER, emailTo: user2!.email, amount })
 
     return { user1, user2 }
   }

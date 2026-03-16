@@ -38,14 +38,13 @@ describe('TransferUseCase (integration)', () => {
     await createUserUseCase.execute({ name: 'User2', email: 'user2@email.com', password: 'senha123' })
     const user1 = await prisma.user.findFirst({ where: { email: 'user1@email.com' } })
     const user2 = await prisma.user.findFirst({ where: { email: 'user2@email.com' } })
-    const walletTo = await prisma.wallet.findFirst({ where: { userId: user2!.id } })
 
     await depositUseCase.execute({ requesterId: user1!.id, requesterRole: RoleEnum.USER, amount: 100 }) // depositar para poder transferir
 
     await transferUseCase.execute({
       requesterId: user1!.id,
       requesterRole: RoleEnum.USER,
-      walletToId: walletTo!.id,
+      emailTo: user2!.email,
       amount: 50,
     })
 
@@ -60,12 +59,11 @@ describe('TransferUseCase (integration)', () => {
   it('should throw BadRequestException when transferring to own wallet', async () => {
     await createUserUseCase.execute({ name: 'Raphael', email: 'raphael@email.com', password: 'senha123' })
     const user = await prisma.user.findFirst({ where: { email: 'raphael@email.com' } })
-    const wallet = await prisma.wallet.findFirst({ where: { userId: user!.id } })
 
     await expect(transferUseCase.execute({
       requesterId: user!.id,
       requesterRole: RoleEnum.USER,
-      walletToId: wallet!.id,
+      emailTo: user!.email,
       amount: 50,
     })).rejects.toThrow(BadRequestException)
   })
@@ -75,7 +73,7 @@ describe('TransferUseCase (integration)', () => {
     await expect(transferUseCase.execute({
       requesterId: 'non-existent-user',
       requesterRole: RoleEnum.USER,
-      walletToId: 'any-wallet',
+      emailTo: 'any@wallet.com',
       amount: 50,
     })).rejects.toThrow(NotFoundException)
   })
@@ -87,7 +85,7 @@ describe('TransferUseCase (integration)', () => {
     await expect(transferUseCase.execute({
       requesterId: user!.id,
       requesterRole: RoleEnum.USER,
-      walletToId: 'non-existent-wallet',
+      emailTo: 'notfound@wallet.com',
       amount: 50,
     })).rejects.toThrow(NotFoundException)
   })
@@ -97,12 +95,11 @@ describe('TransferUseCase (integration)', () => {
     await createUserUseCase.execute({ name: 'User2', email: 'user2@email.com', password: 'senha123' })
     const user1 = await prisma.user.findFirst({ where: { email: 'user1@email.com' } })
     const user2 = await prisma.user.findFirst({ where: { email: 'user2@email.com' } })
-    const walletTo = await prisma.wallet.findFirst({ where: { userId: user2!.id } })
 
     await expect(transferUseCase.execute({
       requesterId: user1!.id,
       requesterRole: RoleEnum.USER,
-      walletToId: walletTo!.id,
+      emailTo: user2!.email,
       amount: 0,
     })).rejects.toThrow(BadRequestException)
   })
@@ -112,12 +109,11 @@ describe('TransferUseCase (integration)', () => {
     await createUserUseCase.execute({ name: 'User2', email: 'user2@email.com', password: 'senha123' })
     const user1 = await prisma.user.findFirst({ where: { email: 'user1@email.com' } })
     const user2 = await prisma.user.findFirst({ where: { email: 'user2@email.com' } })
-    const walletTo = await prisma.wallet.findFirst({ where: { userId: user2!.id } })
 
     await expect(transferUseCase.execute({
       requesterId: user1!.id,
       requesterRole: RoleEnum.USER,
-      walletToId: walletTo!.id,
+      emailTo: user2!.email,
       amount: 100,
     })).rejects.toThrow(BadRequestException)
   })

@@ -1,4 +1,4 @@
-import { ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common'
+import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { TestingModule } from '@nestjs/testing'
 import { CreateUserUseCase } from 'src/modules/core/application/usecases/CreateUserUseCase'
 import { InactivateUserUseCase } from 'src/modules/core/application/usecases/InactivateUserUseCase'
@@ -115,7 +115,7 @@ describe('InactivateUserUseCase (integration)', () => {
     })).rejects.toThrow(NotFoundException)
   })
 
-  it('should throw BadRequestException when user is already inactive', async () => {
+  it('should throw NotFoundException when user is already inactive', async () => {
     await createUserUseCase.execute({ name: 'Raphael', email: 'raphael@email.com', password: 'senha123' })
     await createUserUseCase.execute({ name: 'Admin', email: 'admin@email.com', password: 'senha123' })
     const user = await prisma.user.findFirst({ where: { email: 'raphael@email.com' } })
@@ -127,6 +127,6 @@ describe('InactivateUserUseCase (integration)', () => {
       requesterId: adminUser!.id,
       requesterRole: RoleEnum.ADMIN,
       targetId: user!.id,
-    })).rejects.toThrow(BadRequestException)
+    })).rejects.toThrow(NotFoundException)
   })
 })
