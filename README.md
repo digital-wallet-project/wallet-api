@@ -63,9 +63,10 @@ npm run start:dev
 - Não pode ser deletada
 
 ### Transações
-- **Depósito:** Valor mínimo de R$ 10,00, apenas na própria carteira
-- **Transferência:** Saldo suficiente obrigatório, valor deve ser maior que zero, não é permitido transferir para si mesmo
+- **Depósito:** Valor mínimo de R$ 10,00, apenas na própria carteira- 
+- **Transferência:** Saldo suficiente obrigatório, valor deve ser maior que zero, não é permitido transferir para si mesmo, transferência realizada pelo email do destinatário
 - **Estorno:** Apenas Admin, somente transferências concluídas, prazo de 24h
+- **Listagem:** Usuário vê apenas suas próprias transações, Admin vê todas as transações do sistema
 
 ## Rotas
 
