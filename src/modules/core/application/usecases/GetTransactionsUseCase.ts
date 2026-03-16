@@ -5,6 +5,7 @@ import { WalletRepository } from '../../infra/repository/impl/WalletRepository'
 import { ITransactionRepo } from '../../infra/repository/ITransactionRepo'
 import { TransactionRepository } from '../../infra/repository/impl/TransactionRepository'
 import { IGetTransactionsPayload } from 'src/shared/core/interfaces/transaction.interface'
+import { RoleEnum } from 'src/shared/core/enums/RoleEnum'
 
 @Injectable()
 export class GetTransactionsUseCase {
@@ -16,6 +17,12 @@ export class GetTransactionsUseCase {
   ) {}
 
   async execute(payload: IGetTransactionsPayload): Promise<Transaction[]> {
+    const isAdmin = payload.requesterRole === RoleEnum.ADMIN
+
+    if (isAdmin) {
+      return await this.transactionRepo.findAll(payload.type)
+    }
+    
     const wallet = await this.walletRepo.findByUserId(payload.requesterId)
     if (!wallet)
       throw new NotFoundException('Wallet not found')

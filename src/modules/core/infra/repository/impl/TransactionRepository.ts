@@ -20,7 +20,7 @@ export class TransactionRepository implements ITransactionRepo {
     return await this.prisma.transaction.findFirst({ where: { id } })
   }
 
-  async findByWalletId(walletId: string, type?: TransactionTypeEnum): Promise<Transaction[]> {
+    async findByWalletId(walletId: string, type?: TransactionTypeEnum): Promise<Transaction[]> {
     return await this.prisma.transaction.findMany({
       where: {
         OR: [
@@ -29,7 +29,48 @@ export class TransactionRepository implements ITransactionRepo {
         ],
         ...(type && { type }),
       },
+      include: {
+        WalletFrom: {
+          include: {
+            User: {
+              select: { email: true }
+            }
+          }
+        },
+        WalletTo: {
+          include: {
+            User: {
+              select: { email: true }
+            }
+          }
+        }
+      },
       orderBy: { createdAt: 'desc' },
+    })
+  }
+
+  async findAll(type?: TransactionTypeEnum): Promise<any[]> {
+    return await this.prisma.transaction.findMany({
+      where: {
+        ...(type && { type })
+      },
+      include: {
+        WalletFrom: {
+          include: {
+            User: {
+              select: { email: true }
+            }
+          }
+        },
+        WalletTo: {
+          include: {
+            User: {
+              select: { email: true }
+            }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
     })
   }
 

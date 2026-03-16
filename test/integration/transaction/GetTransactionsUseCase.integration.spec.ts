@@ -71,6 +71,27 @@ describe('GetTransactionsUseCase (integration)', () => {
     expect(transactions[0].type).toBe(TransactionTypeEnum.DEPOSIT)
   })
 
+  it('should return all transactions from all users when admin', async () => {
+    await createUserUseCase.execute({ name: 'User1', email: 'user1@email.com', password: 'senha123' })
+    await createUserUseCase.execute({ name: 'User2', email: 'user2@email.com', password: 'senha123' })
+    await createUserUseCase.execute({ name: 'Admin', email: 'admin@email.com', password: 'senha123' })
+    const user1 = await prisma.user.findFirst({ where: { email: 'user1@email.com' } })
+    const user2 = await prisma.user.findFirst({ where: { email: 'user2@email.com' } })
+    const adminUser = await prisma.user.findFirst({ where: { email: 'admin@email.com' } })
+    await prisma.user.update({ where: { id: adminUser!.id }, data: { role: RoleEnum.ADMIN } })
+
+    await depositUseCase.execute({ requesterId: user1!.id, requesterRole: RoleEnum.USER, amount: 100 })
+    await depositUseCase.execute({ requesterId: user2!.id, requesterRole: RoleEnum.USER, amount: 50 })
+    await transferUseCase.execute({ requesterId: user1!.id, requesterRole: RoleEnum.USER, emailTo: 'user2@email.com', amount: 30 })
+
+    const transactions = await getTransactionsUseCase.execute({
+      requesterId: adminUser!.id,
+      requesterRole: RoleEnum.ADMIN,
+    })
+
+    expect(transactions).toHaveLength(3)
+  })
+
   it('should return empty array when no transactions', async () => {
     await createUserUseCase.execute({ name: 'Raphael', email: 'raphael@email.com', password: 'senha123' })
     const user = await prisma.user.findFirst({ where: { email: 'raphael@email.com' } })
