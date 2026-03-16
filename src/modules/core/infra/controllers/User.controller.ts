@@ -96,7 +96,6 @@ export class UserController {
     }
   }
 
-
   @Delete('/:id')
   @UseGuards(JwtGuard)
   @ApiHeader({ 
@@ -111,10 +110,6 @@ export class UserController {
   @ApiResponse({ 
     status: 200, 
     description: 'User inactivated successfully'
-  })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'User is already inactive' 
   })
   @ApiResponse({ 
     status: 403, 

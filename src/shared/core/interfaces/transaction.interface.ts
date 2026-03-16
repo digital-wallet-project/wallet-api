@@ -12,7 +12,7 @@ export interface ITransferPayload {
   requesterId: string
   requesterRole: RoleEnum
   amount: number
-  walletToId: string
+  emailTo: string
   description?: string
 }
 

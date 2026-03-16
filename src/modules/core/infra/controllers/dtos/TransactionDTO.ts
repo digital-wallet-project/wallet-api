@@ -22,7 +22,7 @@ export class TransferDTO {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  walletToId: string
+  emailTo: string
 
   @IsOptional()
   @IsString()

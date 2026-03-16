@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { User } from '@prisma/client'
 import { IUserRepo } from '../../infra/repository/IUserRepo'
 import { UserRepository } from '../../infra/repository/impl/UserRepository'
@@ -20,11 +20,8 @@ export class InactivateUserUseCase {
       throw new ForbiddenException('You can only deactivate your own account')
 
     const target = await this.userRepo.findById(payload.targetId)
-    if (!target)
+    if (!target || !target.isActive)
       throw new NotFoundException('User not found')
-
-    if (!target.isActive)
-      throw new BadRequestException('User is already inactive')
 
     // ADMIN não pode inativar outro ADMIN
     if (isAdmin && !isSelf && target.role === RoleEnum.ADMIN)

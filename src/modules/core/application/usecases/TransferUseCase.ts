@@ -1,8 +1,10 @@
-import { Inject, Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common'
+import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
 import { IWalletRepo } from '../../infra/repository/IWalletRepo'
 import { WalletRepository } from '../../infra/repository/impl/WalletRepository'
 import { ITransactionRepo } from '../../infra/repository/ITransactionRepo'
 import { TransactionRepository } from '../../infra/repository/impl/TransactionRepository'
+import { UserRepository } from '../../infra/repository/impl/UserRepository'
+import { IUserRepo } from '../../infra/repository/IUserRepo'
 import { PrismaService } from 'src/shared/infra/database/prisma/PrismaService'
 import { TransactionDomain } from '../../domain/entity/TransactionDomain'
 import { TransactionTypeEnum } from 'src/shared/core/enums/TransactionTypeEnum'
@@ -16,6 +18,8 @@ export class TransferUseCase {
     private readonly walletRepo: IWalletRepo,
     @Inject(TransactionRepository)
     private readonly transactionRepo: ITransactionRepo,
+    @Inject(UserRepository)
+    private readonly userRepo: IUserRepo,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -24,7 +28,12 @@ export class TransferUseCase {
     if (!walletFrom)
       throw new NotFoundException('Wallet not found')
 
-    const walletTo = await this.walletRepo.findById(payload.walletToId)
+    const userTo = await this.userRepo.findByEmail(payload.emailTo)
+    if (!userTo || !userTo.isActive)
+      throw new NotFoundException('Destination user not found')
+
+    const walletTo = await this.walletRepo.findByUserId(userTo.id)
+
     if (!walletTo)
       throw new NotFoundException('Destination wallet not found')
 
