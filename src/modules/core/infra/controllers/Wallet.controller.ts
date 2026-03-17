@@ -45,44 +45,4 @@ export class WalletController {
       return res.status(err.status ?? 500).json({ message: err.message })
     }
   }
-
-  @Get('/:id')
-  @UseGuards(JwtGuard)
-  @ApiHeader({ 
-    name: 'Authorization', 
-    description: 'Bearer token', 
-    required: true 
-  })
-  @ApiOperation({
-    summary: 'Get wallet by id',
-    description: 'Returns a wallet by id. Admin only.',
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Wallet found' 
-  })
-  @ApiResponse({ 
-    status: 403, 
-    description: 'Forbidden – admin only' 
-  })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Wallet not found' 
-  })
-  @ApiResponse({ 
-    status: 500, 
-    description: 'Internal server error' 
-  })
-  async getWallet(@Res() res: Response, @Req() req: any, @Param('id') id: string) {
-    try {
-      const result = await this.getWalletUseCase.execute({
-        requesterId: req.user.id,
-        requesterRole: req.user.role,
-        walletId: id,
-      })
-      return res.status(200).json(result)
-    } catch (err) {
-      return res.status(err.status ?? 500).json({ message: err.message })
-    }
-  }
 }

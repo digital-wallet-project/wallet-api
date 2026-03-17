@@ -38,7 +38,7 @@ docker-compose up
 # Rodar as migrations
 npx prisma migrate dev
 
-# Popular o banco com o admin
+# Popular o banco com o ADMIN
 npx prisma db seed
 
 # Rodar a aplicação
@@ -50,11 +50,11 @@ npm run start:dev
 ### Usuário
 - Ao criar um usuário, uma carteira é criada automaticamente
 - Usuário pode atualizar e inativar a própria conta
-- Admin pode atualizar e inativar qualquer conta USER
-- Admin não pode inativar outro Admin
-- Admin não pode se inativar se for o único Admin
-- Apenas Admin pode reativar qualquer conta
-- Apenas Admin pode listar usuários
+- ADMIN pode atualizar e inativar qualquer conta USER
+- ADMIN não pode inativar outro ADMIN
+- ADMIN não pode se inativar se for o único ADMIN
+- Apenas ADMIN pode reativar qualquer conta
+- Apenas ADMIN pode listar usuários
 - Usuário inativo não consegue fazer login
 
 ### Carteira
@@ -65,8 +65,8 @@ npm run start:dev
 ### Transações
 - **Depósito:** Valor mínimo de R$ 10,00, apenas na própria carteira- 
 - **Transferência:** Saldo suficiente obrigatório, valor deve ser maior que zero, não é permitido transferir para si mesmo, transferência realizada pelo email do destinatário
-- **Estorno:** Apenas Admin, somente transferências concluídas, prazo de 24h
-- **Listagem:** Usuário vê apenas suas próprias transações, Admin vê todas as transações do sistema
+- **Estorno:** Apenas ADMIN, somente transferências concluídas, prazo de 24h
+- **Listagem:** Usuário vê apenas suas próprias transações, ADMIN vê todas as transações do sistema
 
 ## Rotas
 
@@ -88,7 +88,6 @@ npm run start:dev
 | Método | Rota | Descrição | Auth |
 |--------|------|-----------|------|
 | GET | /wallet | Ver própria carteira | ✅ |
-| GET | /wallet/:id | Ver qualquer carteira | ✅ Admin |
 
 ### Transaction
 | Método | Rota | Descrição | Auth |
